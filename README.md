@@ -1,7 +1,7 @@
 Introduction
 ============
 
-_shoogle_ is a tool to use the Google API from the command line. *shoogle* does not know about the details of each API, instead, it uses the Google Discovery API . It works on any platform -GNU/Linux, BSD, OS X, Windows, ...- that runs Python 3.x.
+_shoogle_ is a tool to use the Google API from the command line. It works on any platform -GNU/Linux, BSD, OS X, Windows, ...- that runs Python 3.x.
 
 Install
 =======
@@ -17,12 +17,12 @@ Features
 ========
 
 * Provides infrastructure for Oauth2 authentication (console and browser).
-* Exposes all services supported by the Python Gooogle API.
+* Exposes all services supported by the Gooogle Python API.
 
 Notes
 =====
 
-* You must create keys/client_secrets_file whenever necessary. Each service has its own policies, check the Google documentation.
+* You must create your own keys/ or client-secrets-file whenever necessary from the Developers console. Each service has its own policies, check the Google documentation for more details. 
 
 Examples
 ========
@@ -67,7 +67,7 @@ $ cat get-longurl.json
   "shortUrl": "http://goo.gl/Du5PSN"
 }
 
-$ shoogle run -c your_client_id.json urlshortener:v1.url.get get-longurl.json
+$ shoogle execute -c your_client_id.json urlshortener:v1.url.get get-longurl.json
 {
   "part": "snippet",
   "body": {
@@ -79,7 +79,7 @@ $ shoogle run -c your_client_id.json urlshortener:v1.url.get get-longurl.json
 * Upload a video:
 
 ```
-$ cat get-longurl.json
+$ cat upload-video.json
 {
   "part": "snippet",
   "body": {
@@ -87,7 +87,7 @@ $ cat get-longurl.json
   }
 }
 
-$ shoogle run -c your_client_id.json youtube:v3.videos.insert upload-video.json -f video.mp4
+$ shoogle execute -c your_client_id.json youtube:v3.videos.insert upload-video.json -f video.mp4
 {
   "snippet": {
     "channelId": "UCn_xs2hBuoziv_X_4EIeO9Q",

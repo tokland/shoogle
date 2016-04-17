@@ -170,6 +170,7 @@ def show_resources(service_id, search_resource_name, options):
 
 def show_methods(service_id, resource_name, search_method_name, options):
     service = get_service(service_id)
+    logger.info("Service documentation: {}".format(service["documentationLink"]))
     methods = service["resources"][resource_name]["methods"]
 
     filtered_methods = [
@@ -243,7 +244,7 @@ def show_method(service, method, options):
     logger.info("Request (level={}, --debug-request-level=N to change):".format(level))
     output(pretty_json(request))
 
-# Command: run
+# Command: execute
 
 def execute_media_request(request):
     while 1:
@@ -319,24 +320,24 @@ def get_parser(description):
     parser_show.add_argument('api_path', metavar="API_PATH", nargs='?', default="",
         help="SERVICE:VERSION.RESOURCE.METHOD")
     
-    # Command: run
+    # Command: execute
     
-    parser_run = subparsers.add_parser('run', help='Send API request')
+    parser_execute = subparsers.add_parser('execute', help='Execute an API request')
     
-    parser_run.add_argument('-c', '--client-secret-file', metavar="PATH", 
+    parser_execute.add_argument('-c', '--client-secret-file', metavar="PATH", 
         help="Use a client secret JSON file")
-    parser_run.add_argument('-f', '--media-file', metavar="PATH",
+    parser_execute.add_argument('-f', '--media-file', metavar="PATH",
         help='File to use for media-related methods')
-    parser_run.add_argument('--browser-auth', action="store_true", 
+    parser_execute.add_argument('--browser-auth', action="store_true", 
         help="Use a browser to authentify")
-    parser_run.add_argument('--credentials-file', 
+    parser_execute.add_argument('--credentials-file', 
         metavar="PATH", help="Select profile to use (with separate credentials)")
-    parser_run.add_argument('--credentials-profile', default="default",
+    parser_execute.add_argument('--credentials-profile', default="default",
         metavar="NAME", help="Select profile to use (wtih separate credentials)")
 
-    parser_run.add_argument('api_path', metavar="API_PATH",
+    parser_execute.add_argument('api_path', metavar="API_PATH",
         help="SERVICE:VERSION.RESOURCE.METHOD")
-    parser_run.add_argument('json_request', metavar="JSON_FILE",
+    parser_execute.add_argument('json_request', metavar="JSON_FILE",
         help="File containing the request JSON (use '-' to read from stdin)")
         
     return parser
@@ -354,7 +355,7 @@ def run(args):
             show_resources(service_id, resource_name, options)
         else:
             show_methods(service_id, resource_name, method_name, options)
-    elif options.command == "run":
+    elif options.command == "execute":
         service_id, resource_name, method_name = pad_list(options.api_path.split(".", 2), 3)
         method_options = load_json((sys.stdin if options.json_request == "-" 
             else open(options.json_request)).read())
