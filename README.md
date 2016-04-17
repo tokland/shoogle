@@ -10,7 +10,7 @@ Dependencies
   * Packages: [google-api-python-client](https://developers.google.com/api-client-library/python).
 
 ```
-$ sudo pip install google-api-python-client
+$ sudo pip install google-api-python-client jsmin httplib2
 ```
 
 Install
@@ -38,17 +38,47 @@ Features
 Examples
 ========
 
+* Show details of services/resources/methods:
+
+```
+$ bin/shoogle show url
+urlshortener:v1 - URL Shortener API
+```
+
+```
+$ bin/shoogle show urlshortener:v1
+urlshortener:v1.url
+```
+
+```
+$ bin/shoogle show urlshortener:v1.url
+urlshortener:v1.url.get - Expands a short URL or gets creation time and analytics.
+urlshortener:v1.url.insert - Creates a new short URL.
+urlshortener:v1.url.list - Retrieves a list of URLs shortened by a user.
+```
+
+```
+$ bin/shoogle show urlshortener:v1.url.get
+[INFO] Response (level=0, --debug-response-level=N to change):
+{
+  "$ref": "Url"
+}
+[INFO] Request (level=1, --debug-request-level=N to change):
+{
+  "shortUrl": "(string) The short URL, including the protocol - required"
+}
+```
+
 * Expand a short URL:
 
 ```
-$ cat > get-longurl.json << EOF
+$ cat get-longurl.json 
 {
-  "key": "MY_API_SECRET_KEY", // You can add comments
+  "key": "MY_API_SECRET_KEY", // You can use JS comments
   "shortUrl": "http://goo.gl/Du5PSN"
 }
-EOF
 
-$ shoogle run -c client_id.json urlshortener:v1.url.get get-longurl.json
+$ shoogle run -c your_client_id.json urlshortener:v1.url.get get-longurl.json
 {
   "part": "snippet",
   "body": {
@@ -60,16 +90,15 @@ $ shoogle run -c client_id.json urlshortener:v1.url.get get-longurl.json
 * Upload a video:
 
 ```
-$ cat > get-longurl.json << EOF
+$ cat get-longurl.json
 {
   "part": "snippet",
   "body": {
     "snippet": {"title": "My great video"}
   }
 }
-EOF
 
-$ shoogle run youtube:v3.videos.insert upload-video.json -f video.mp4
+$ shoogle run -c your_client_id.json youtube:v3.videos.insert upload-video.json -f video.mp4
 {
   "snippet": {
     "channelId": "UCn_xs2hBuoziv_X_4EIeO9Q",
