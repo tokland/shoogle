@@ -16,18 +16,21 @@ $ sudo python setup.py install
 Features
 ========
 
-* Provides infrastructure for Oauth2 authentication (console and browser).
+* Provides infrastructure for Oauth2 authentication (console or QT/GTK browser).
 * Exposes all services supported by the Gooogle Python API.
+* Inspect the services/resources/method of the API.
+* Generates template to send JSON requests.
+* Credentials are created/reused depending on the scopes needed.
 
 Notes
 =====
 
-* You must create your own keys/ or client-secrets-file whenever necessary from the Developers console. Each service has its own policies, check the Google documentation for more details. 
+* You must enable the APIs you want to use and create the required keys or secret in the [API Manager](https://console.developers.google.com/apis/). Each service has its own policies, check the Google documentation for more details.
 
 Examples
 ========
 
-* Show details of services/resources/methods:
+* Show details (incrementally) of services/resources/methods:
 
 ```
 $ shoogle show url
@@ -63,7 +66,7 @@ $ shoogle show urlshortener:v1.url.get
 ```
 $ cat get-longurl.json 
 {
-  "key": "MY_API_SECRET_KEY", // You can use JS comments
+  "key": "MY_SECRET_KEY", // You can use JS comments!
   "shortUrl": "http://goo.gl/Du5PSN"
 }
 
@@ -83,7 +86,9 @@ $ cat upload-video.json
 {
   "part": "snippet",
   "body": {
-    "snippet": {"title": "My great video"}
+    "snippet": {
+      "title": "My great video"
+    }
   }
 }
 
@@ -100,7 +105,6 @@ $ shoogle execute -c your_client_id.json youtube:v3.videos.insert upload-video.j
   "id": "OaL345345J0",
   ...
 }
-
 ```
 
 More
@@ -111,6 +115,6 @@ More
 Feedback
 ========
 
-* Issues: Please open only issues regarding bugs of this script. If you have any problem with the keys, parameters, responses, etc, use the [Google Forums](https://developers.google.com/) or [StackOverflow](http://stackoverflow.com/questions/tagged/google-api).
+* Issues: Please open only issues for bugs of the package. If you have problems regarding how to use the API itself (how to send the auth keys, create the secret files, build the parameters, manage quotas, etc), use the [Google Forums](https://developers.google.com/) or [StackOverflow](http://stackoverflow.com/questions/tagged/google-api) instead.
 
 * [Donations](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=pyarnau%40gmail%2ecom&lc=US&item_name=youtube%2dupload&no_note=0&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest).

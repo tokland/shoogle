@@ -237,10 +237,10 @@ def show_method(service, method, options):
     
     body_params = ([("body", method.get("request"))] if method.get("request") else [])
     minimal_params = sorted(required_service_params + required_method_params) + body_params
-    all_parameters = sorted(service_params + method_params + body_params) 
+    all_params = sorted(service_params + method_params + body_params) 
         #key=lambda pair: (not (pair[1].get("required") or False), pair[0]))
     level = options.debug_request_level
-    request = get_example_request(minimal_params, schemas, level)
+    request = get_example_request(all_params, schemas, level)
     logger.info("Request (level={}, --debug-request-level=N to change):".format(level))
     output(pretty_json(request))
 
