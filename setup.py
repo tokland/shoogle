@@ -1,58 +1,49 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
 
-
-with open('README.rst') as readme_file:
-    readme = readme_file.read()
-
-with open('HISTORY.rst') as history_file:
-    history = history_file.read()
-
 requirements = [
-    # TODO: put package requirements here
+    "google-api-python-client",
+    "jsmin",
+    "httplib2",
 ]
 
-test_requirements = [
-    # TODO: put package test requirements here
-]
+test_requirements = []
 
 setup(
     name='shoogle',
     version='0.1.0',
     description="Google API from the command line",
-    long_description=readme + '\n\n' + history,
     author="Arnau Sanchez",
     author_email='pyarnau@gmail.com',
     url='https://github.com/tokland/shoogle',
     packages=[
         'shoogle',
+        "shoogle/auth"
     ],
-    package_dir={'shoogle':
-                 'shoogle'},
+    package_dir={'shoogle': 'shoogle'},
+    scripts=["bin/shoogle"],
     include_package_data=True,
     install_requires=requirements,
     license="ISCL",
     zip_safe=False,
     keywords='shoogle',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: ISC License (ISCL)',
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: End Users/Desktop',
+        'License :: OSI Approved :: GNU General Public License (GPL)',
         'Natural Language :: English',
-        "Programming Language :: Python :: 2",
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
+        'Operating System :: POSIX',
+        'Operating System :: Microsoft :: Windows',
+        'Topic :: Internet :: WWW/HTTP',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
     ],
     test_suite='tests',
-    tests_require=test_requirements
+    #tests_require=test_requirements,
 )

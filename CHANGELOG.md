@@ -1,5 +1,6 @@
-# Change Log
+# ChangeLog
 
-## [Unreleased]
+## [0.1.0]
 
-* Get auth code from youtube-upload.
+* Provides infrastructure for Oauth2 authentication (console and browser).
+* Exposes all services supported by the Python Gooogle API.

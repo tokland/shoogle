@@ -1,0 +1,12 @@
+#!/usr/bin/env python
+
+def add_parent_directory_to_sys_path():
+    current_directory = os.path.dirname(os.path.realpath(__file__))
+    sys.path.insert(0, os.path.join(current_directory, os.pardir))
+
+import os.path
+import sys
+
+add_parent_directory_to_sys_path()
+import shoogle
+sys.exit(shoogle.main(sys.argv[1:]))
