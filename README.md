@@ -1,17 +1,7 @@
 Introduction
 ============
 
-_shoogle_ is a tool to use the Google API from the command line. *shoogle* does not know about the details of each API, instead, it uses the Google Discovery API . It works on any platform -GNU/Linux, BSD, OS X, Windows, ...- that runs Python.
-
-Dependencies
-============
-
-  * [Python 3.x](http://www.python.org).
-  * Packages: [google-api-python-client](https://developers.google.com/api-client-library/python).
-
-```
-$ sudo pip install google-api-python-client jsmin httplib2
-```
+_shoogle_ is a tool to use the Google API from the command line. *shoogle* does not know about the details of each API, instead, it uses the Google Discovery API . It works on any platform -GNU/Linux, BSD, OS X, Windows, ...- that runs Python 3.x.
 
 Install
 =======
@@ -23,17 +13,16 @@ $ cd shoogle-master
 $ sudo python setup.py install
 ```
 
-  * Or run directly from sources:
-
-```
-$ bin/shoogle ...
-```
-
 Features
 ========
 
 * Provides infrastructure for Oauth2 authentication (console and browser).
 * Exposes all services supported by the Python Gooogle API.
+
+Notes
+=====
+
+* You must create keys/client_secrets_file whenever necessary. Each service has its own policies, check the Google documentation.
 
 Examples
 ========
@@ -41,24 +30,24 @@ Examples
 * Show details of services/resources/methods:
 
 ```
-$ bin/shoogle show url
+$ shoogle show url
 urlshortener:v1 - URL Shortener API
 ```
 
 ```
-$ bin/shoogle show urlshortener:v1
+$ shoogle show urlshortener:v1
 urlshortener:v1.url
 ```
 
 ```
-$ bin/shoogle show urlshortener:v1.url
+$ shoogle show urlshortener:v1.url
 urlshortener:v1.url.get - Expands a short URL or gets creation time and analytics.
 urlshortener:v1.url.insert - Creates a new short URL.
 urlshortener:v1.url.list - Retrieves a list of URLs shortened by a user.
 ```
 
 ```
-$ bin/shoogle show urlshortener:v1.url.get
+$ shoogle show urlshortener:v1.url.get
 [INFO] Response (level=0, --debug-response-level=N to change):
 {
   "$ref": "Url"
@@ -121,5 +110,7 @@ More
 
 Feedback
 ========
+
+* Issues: Please open only issues regarding bugs of this script. If you have any problem with the keys, parameters, responses, etc, use the [Google Forums](https://developers.google.com/) or [StackOverflow](http://stackoverflow.com/questions/tagged/google-api).
 
 * [Donations](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=pyarnau%40gmail%2ecom&lc=US&item_name=youtube%2dupload&no_note=0&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest).
