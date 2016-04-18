@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+import pypandoc
+from distutils.core import setup
 
 requirements = [
     "google-api-python-client",
@@ -13,10 +11,14 @@ requirements = [
 
 test_requirements = []
 
+long_description = pypandoc.convert('README.md', 'rst') + '\n\n' + \
+    pypandoc.convert('CHANGELOG.md', 'rst') 
+ 
 setup(
     name='shoogle',
     version='0.1.0',
     description="Google API from the command line",
+    long_description=long_description,
     author="Arnau Sanchez",
     author_email='pyarnau@gmail.com',
     url='https://github.com/tokland/shoogle',
