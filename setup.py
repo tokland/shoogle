@@ -16,7 +16,7 @@ long_description = pypandoc.convert('README.md', 'rst') + '\n\n' + \
  
 setup(
     name='shoogle',
-    version='0.1.0',
+    version='0.1.1',
     description="Google API from the command line",
     long_description=long_description,
     author="Arnau Sanchez",
