@@ -1,5 +1,7 @@
 # Shoogle
 
+Use the Google API from the shell. Requires Python 3.x.
+
 ## Features
 
 * Exposes agnostically all the services in the API.
@@ -8,6 +10,14 @@
 * Credentials for scopes (separated by profiles) are stored for later use.
 
 ## Install
+
+### From PyPi
+
+```shell
+$ sudo pip install shoogle
+```
+
+### From sources
 
 ```shell
 $ wget https://github.com/tokland/shoogle/archive/master.zip

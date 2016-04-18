@@ -306,8 +306,11 @@ def do_request(service_id, resource_name, method_name, method_options, options):
 
 def get_parser(description):
     parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('-v', '--version', action="store_true", 
+        help="Show version")
+
     subparsers = parser.add_subparsers(help='Commands', dest="command")
-    subparsers.required = True
+    subparsers.required = False
     
     # Command: show
     
@@ -346,8 +349,11 @@ def run(args):
     """Acces to Google API services."""
     parser = get_parser("Command-line interface for the Google API.")
     options = parser.parse_args(args)
-    
-    if options.command == "show":
+
+    if options.version:
+        from shoogle import __version__
+        output(__version__)
+    elif options.command == "show":
         service_id, resource_name, method_name = pad_list(options.api_path.split(".", 2), 3)
         if resource_name is None:
             show_services(service_id, options)
@@ -361,11 +367,13 @@ def run(args):
             else open(options.json_request)).read())
         response = do_request(service_id, resource_name, method_name, method_options, options)
         output(pretty_json(response))
+    else:
+        parser.print_help()
+        return 2
 
 def main(args):
     try:
-        run(args)
-        return 0
+        return run(args)
     except ShoogleException as error:
         logger.error(error)
         return 1
