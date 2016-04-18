@@ -16,11 +16,10 @@ $ sudo python setup.py install
 Features
 ========
 
-* Provides infrastructure for Oauth2 authentication (console or QT/GTK browser).
-* Exposes all services supported by the Gooogle Python API.
-* Inspect the services/resources/method of the API.
-* Generates template to send JSON requests.
-* Credentials are created/reused depending on the scopes needed.
+* Infrastructure for the Oauth2 authentication (console or QT/GTK browser).
+* Exposes agnostically all the services in the API.
+* Generates templates so you can build your JSON requests.
+* Credentials (separated by profiles) are created/reused depending on the scopes needed.
 
 Notes
 =====
@@ -72,10 +71,10 @@ $ cat get-longurl.json
 
 $ shoogle execute -c your_client_id.json urlshortener:v1.url.get get-longurl.json
 {
-  "part": "snippet",
-  "body": {
-    "snippet": {"title": "My great video"}
-  }
+  "status": "OK",
+  "id": "http://goo.gl/Du5PSN",
+  "longUrl": "http://1.bp.blogspot.com/-R0HSXDqlJI8/Tr67i-kr7hI/AAAAAAABMko/gaId6iYuhjA/s1600/12_%252520Cross%252520that%252520bridge%252520when%252520we%252520come%252520to%252520it.jpg",
+  "kind": "urlshortener#url"
 }
 ```
 
