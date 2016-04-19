@@ -2,6 +2,7 @@
 
 Use the Google API from the shell.
 
+```shell
 $ echo '{"shortUrl": "http://goo.gl/Du5PSN"}' | shoogle execute urlshortener:v1.url.get -
 {
   "status": "OK",
@@ -9,19 +10,11 @@ $ echo '{"shortUrl": "http://goo.gl/Du5PSN"}' | shoogle execute urlshortener:v1.
   "longUrl": "http://1.bp.blogspot.com/-R0HSXDqlJI8/Tr67i-kr7hI/AAAAAAABMko/gaId6iYuhjA/s1600/12_%252520Cross%252520that%252520bridge%252520when%252520we%252520come%252520to%252520it.jpg",
   "kind": "urlshortener#url"
 }
-
-## Dependencies
-
-* Python >= 3.0
-
-## Features
-
-* Exposes agnostically all the services in the API.
-* Provides infrastructure for the Oauth2 authentication (console or QT/GTK browser).
-* Shows info so you can build the JSON requests.
-* Credentials for scopes (separated by profiles) are stored for later use.
+```
 
 ## Install
+
+You need Python >= 3.0. 
 
 ### From PyPi
 
@@ -38,9 +31,18 @@ $ cd shoogle-master
 $ sudo python setup.py install
 ```
 
-## Notes
+## Features
 
-* You must enable the APIs you want to use and create the required keys or secret in the [API Manager](https://console.developers.google.com/apis/). Each service has its own policies, check the Google documentation for more details.
+* Exposes agnostically all the services in the API.
+* Provides infrastructure for the Oauth2 authentication (console or QT/GTK browser).
+* Shows info so you can build the JSON requests.
+* Credentials for scopes (separated by profiles) are stored for later use.
+
+## Install
+
+## Configure the API and secret keys
+
+* You must enable the services you want to use and create the required keys or secret file in the [API Manager](https://console.developers.google.com/apis/). Each service has its own policies, check the Google documentation for more details.
 
 ## Commands
 
@@ -49,7 +51,7 @@ $ sudo python setup.py install
 Incrementally show details of services/resources/methods:
 
 ```shell
-$ shoogle show url
+$ shoogle show
 adexchangebuyer2:v2beta1 - Ad Exchange Buyer API II
 adexchangebuyer:v1.2 - Ad Exchange Buyer API
 ...
@@ -59,7 +61,7 @@ youtubereporting:v1 - YouTube Reporting API
 ```
 
 ```shell
-$ shoogle show url
+$ shoogle show short
 urlshortener:v1 - URL Shortener API
 ```
 
@@ -135,6 +137,6 @@ wUArz2nPGqA
 
 ## Feedback
 
-* Issues: Please open issues only to report bugs of the package. If you have problems regarding how to use the API (what authentication files to use, how to create them, how to build the parameters, manage quotas, etc), use the [Google Forums](https://developers.google.com/) or [StackOverflow](http://stackoverflow.com/questions/tagged/google-api) instead.
+* Issues: Please open issues only to report bugs of the package. If you have problems regarding how to use the API itself (what authentication files to use, how to create them, how to build the parameters, quotas management, etc), use the [Google Forums](https://developers.google.com/) or [StackOverflow](http://stackoverflow.com/questions/tagged/google-api) instead.
 
 * [Want to donate?](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=pyarnau%40gmail%2ecom&lc=US&item_name=youtube%2dupload&no_note=0&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest)
