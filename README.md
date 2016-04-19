@@ -1,6 +1,18 @@
 # Shoogle
 
-Use the Google API from the shell. Requires Python 3.x.
+Use the Google API from the shell.
+
+$ echo '{"shortUrl": "http://goo.gl/Du5PSN"}' | shoogle execute urlshortener:v1.url.get -
+{
+  "status": "OK",
+  "id": "http://goo.gl/Du5PSN",
+  "longUrl": "http://1.bp.blogspot.com/-R0HSXDqlJI8/Tr67i-kr7hI/AAAAAAABMko/gaId6iYuhjA/s1600/12_%252520Cross%252520that%252520bridge%252520when%252520we%252520come%252520to%252520it.jpg",
+  "kind": "urlshortener#url"
+}
+
+## Dependencies
+
+* Python >= 3.0
 
 ## Features
 
@@ -28,12 +40,23 @@ $ sudo python setup.py install
 
 ## Notes
 
-* Python 3.x is required.
 * You must enable the APIs you want to use and create the required keys or secret in the [API Manager](https://console.developers.google.com/apis/). Each service has its own policies, check the Google documentation for more details.
 
-## Examples
+## Commands
 
-* Incrementally show details of services/resources/methods:
+### show
+
+Incrementally show details of services/resources/methods:
+
+```shell
+$ shoogle show url
+adexchangebuyer2:v2beta1 - Ad Exchange Buyer API II
+adexchangebuyer:v1.2 - Ad Exchange Buyer API
+...
+youtubeAnalytics:v1beta1 - YouTube Analytics API
+youtubereporting:v1 - YouTube Reporting API
+
+```
 
 ```shell
 $ shoogle show url
@@ -64,16 +87,18 @@ $ shoogle show urlshortener:v1.url.get
 }
 ```
 
+### execute
+
 * Expand a short URL:
 
 ```shell
 $ cat get-longurl.json 
 {
-  "key": "MY_SECRET_KEY", // You can use JS comments!
+  "key": "YOUR_SECRET_KEY", // You can use JS comments!
   "shortUrl": "http://goo.gl/Du5PSN"
 }
 
-$ shoogle execute -c your_client_id.json urlshortener:v1.url.get get-longurl.json
+$ shoogle execute urlshortener:v1.url.get get-longurl.json
 {
   "status": "OK",
   "id": "http://goo.gl/Du5PSN",
@@ -82,7 +107,7 @@ $ shoogle execute -c your_client_id.json urlshortener:v1.url.get get-longurl.jso
 }
 ```
 
-* [jq](https://stedolan.github.io/jq/) is a JSON processor the comes in handy. This example uploads a video building the JSON from a template and extracting the video ID from the response:
+* [jq](https://stedolan.github.io/jq/) is a JSON processor the comes in handy when building or parsing a JSON. This example uploads a video from a template and extracts the ID from the response:
 
 ```shell
 $ cat upload-video.template.json
@@ -90,14 +115,15 @@ $ cat upload-video.template.json
   "part": "snippet",
   "body": {
     "snippet": {
-      "title": $title
+      "title": $title,
+      "description": $description
     }
   }
 }
 ```
 
 ```shell
-$ jq -n -f upload-video.template.json --arg title "My title" |
+$ jq -n -f upload-video.template.json --arg title "My title" --arg description "Hi there!" |
     shoogle execute -c your_client_id.json youtube:v3.videos.insert - -f video.mp4 |
     jq -r '.id'
 wUArz2nPGqA
