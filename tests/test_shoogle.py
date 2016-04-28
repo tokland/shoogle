@@ -17,7 +17,7 @@ import logging
 import tempfile
 
 from shoogle import shoogle
-#logging.disable(logging.CRITICAL)
+from shoogle import lib
 
 import jsmin
 
@@ -32,26 +32,19 @@ def temporal_file(contents):
         yield fd.name
 
 @contextmanager
-def capture(command, *args, **kwargs):
+def main(*args, **kwargs):
     old_stdout, old_stderr = sys.stdout, sys.stderr
     new_stdout, new_stderr = StringIO(), StringIO()
     sys.stdout, sys.stderr = new_stdout, new_stderr
+    debug_logger = lib.get_logger("shoogle", level=logging.ERROR, channel=new_stderr)
+    kwargs_with_logger = lib.merge(kwargs, dict(logger=debug_logger))
     try:
-        command(*args, **kwargs)
+        shoogle.main(*args, **kwargs_with_logger)
     finally:
         sys.stdout, sys.stderr  = old_stdout, old_stderr
     yield (new_stdout.getvalue(), new_stderr.getvalue())
 
-@contextmanager
-def main(args):
-    with capture(shoogle.main, args) as (out, err):
-        yield (out, err)
-
 class TestShoogle(unittest.TestCase):
-
-    def tearDown(self):
-        pass
-
     def test_main_without_arguments_shows_usage_and_help_messages(self):
         with main([]) as (out, err):
             self.assertIn("usage: ", err)

@@ -1,17 +1,18 @@
-import re
+import errno
+import os
 import logging
 import sys
 import json
 
 import jsmin
-import httplib2
 
-def get_logger(name, level=logging.INFO, format='[%(levelname)s] %(message)s', channel=sys.stderr):
+def get_logger(name, level=logging.INFO, channel=sys.stderr):
+    logger_format = '[%(levelname)s] %(message)s'
     logger = logging.getLogger(name)
     logger.setLevel(level)
     handler = logging.StreamHandler(channel)
     handler.setLevel(level)
-    formatter = logging.Formatter(format)
+    formatter = logging.Formatter(logger_format)
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     return logger
@@ -19,28 +20,19 @@ def get_logger(name, level=logging.INFO, format='[%(levelname)s] %(message)s', c
 def first(it):
     return next(it, None)
 
-def merge(d1, d2):
-    d3 = d1.copy()
-    d3.update(d2)
-    return d3
+def merge(dict1, dict2):
+    dict3 = dict1.copy()
+    dict3.update(dict2)
+    return dict3
 
-def pad_list(lst, n):
-    return lst[:n] + [None] * (n - len(lst))
+def pad_list(lst, size):
+    return lst[:size] + [None] * (size - len(lst))
 
 def pretty_json(obj):
     return json.dumps(obj, indent=2)
 
 def output(obj):
     print(str(obj))
-
-def download(url, cache_directory, logger):
-    logger.info("GET {}".format(url))
-    http = httplib2.Http(cache=cache_directory)
-    headers, content = http.request(url, "GET")
-    if re.match("2..", str(headers.status)):
-        return content.decode('utf-8')
-    else:
-        raise ShoogleException("GET {} - Error: {}".format(url, headers.status))
 
 def mkdir_p(path):
     try:
@@ -50,6 +42,6 @@ def mkdir_p(path):
             pass
         else:
             raise
-            
-def load_json(s):
-    return json.loads(jsmin.jsmin(s))    
+
+def load_json(json_string):
+    return json.loads(jsmin.jsmin(json_string))
