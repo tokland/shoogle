@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import pypandoc
-from distutils.core import setup
+from setuptools import setup
 
 requirements = [
     "google-api-python-client",
@@ -47,5 +47,5 @@ setup(
         'Programming Language :: Python :: 3.5',
     ],
     test_suite='tests',
-    #tests_require=test_requirements,
+    tests_require=test_requirements,
 )

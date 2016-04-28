@@ -1,14 +1,15 @@
-import os
-import re
-import sys
-import json
-import glob
-import uuid
-import errno
-import string
-import logging
 import argparse
 import collections
+import errno
+import glob
+import inspect
+import json
+import logging
+import os
+import re
+import string
+import sys
+import uuid
 
 import jsmin
 import httplib2
@@ -17,79 +18,34 @@ import oauth2client.client
 import googleapiclient.errors
 import googleapiclient.discovery
 
+from shoogle import __version__
 from . import auth
+from . import lib
 
 # Globals
 
-def get_logger(level, format='[%(levelname)s] %(message)s'):
-    logger = logging.getLogger("shoogle")
-    logger.setLevel(level)
-    handler = logging.StreamHandler(sys.stderr)
-    handler.setLevel(level)
-    formatter = logging.Formatter(format)
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    return logger
+global logger
+logger = lib.get_logger("shoogle", level=logging.CRITICAL)
 
 config_dir = os.path.join(os.path.expanduser("~"), ".shoogle")
 cache_dir = os.path.join(config_dir, "cache")
 credentials_base_dir = os.path.join(config_dir, "credentials")
-logger = get_logger(logging.DEBUG)
+output = lib.output
 
-# Lib
-
-def first(it):
-    return next(it, None)
-
-def merge(d1, d2):
-    d3 = d1.copy()
-    d3.update(d2)
-    return d3
-
-def pad_list(lst, n):
-    return lst[:n] + [None] * (n - len(lst))
-
-def pretty_json(obj):
-    return json.dumps(obj, indent=2)
-
-def output(obj):
-    print(str(obj))
-    
-def download(url, cache_directory=cache_dir):
-    logger.info("GET {}".format(url))
-    http = httplib2.Http(cache=cache_directory)
-    headers, content = http.request(url, "GET")
-    if re.match("2..", str(headers.status)):
-        return content.decode('utf-8')
-    else:
-        raise ShoogleException("GET {} - Error: {}".format(url, headers.status))
-
-def mkdir_p(path):
-    try:
-        os.makedirs(path)
-    except OSError as exc:
-        if exc.errno == errno.EEXIST and os.path.isdir(path):
-            pass
-        else:
-            raise
-            
-def load_json(s):
-    return json.loads(jsmin.jsmin(s))    
-
-### App
+### App common
 
 class ShoogleException(Exception): 
     pass
 
 def get_services():
-    apis = download("https://www.googleapis.com/discovery/v1/apis")
-    services = load_json(apis)["items"]
+    apis = lib.download("https://www.googleapis.com/discovery/v1/apis", cache_dir, logger)
+    services = lib.load_json(apis)["items"]
     return dict((service["id"], service) for service in services)
             
 def get_credentials_path(required_scopes, credentials_profile):
     logger.debug("Searching credentials with scopes: " + str(required_scopes))
     credentials_dir = os.path.join(credentials_base_dir, credentials_profile)
-    mkdir_p(credentials_dir)
+    lib.mkdir_p(credentials_dir)
     
     for path in glob.glob(os.path.join(credentials_dir, "*.json")):
         credentials = json.load(open(path))
@@ -109,8 +65,8 @@ def get_service(service_id):
         raise ShoogleException("Service API not found: {}".format(service_id))
     else:        
         service = services[service_id]
-        service_json = download(service["discoveryRestUrl"])
-        return load_json(service_json)
+        service_json = lib.download(service["discoveryRestUrl"], cache_dir, logger)
+        return lib.load_json(service_json)
 
 def get_method(service, resource_name, method_name):
     if resource_name not in service["resources"]:
@@ -223,26 +179,26 @@ def show_method(service, method, options):
     schemas = service["schemas"]
 
     max_level = options.debug_response_level
-    response_json = pretty_json(replace_schemas(schemas, 
-        method.get("response", {}), max_level=max_level))
-    logger.info("Response (level={max_level}, --debug-response-level=N to change):\n{response}"
-        .format(max_level=max_level, response=response_json))
+    response = replace_schemas(schemas, method.get("response", {}), max_level=max_level)
+        
+    output("{id}: {description}".format(id=method["id"], description=method["description"]))
 
     build_param = collections.namedtuple("Param", ["opts"])
     service_params = [(k, build_param(v)) for (k, v) in service.get("parameters", {}).items()]
     method_params = [(k, build_param(v)) for (k, v) in method.get("parameters", {}).items()]
-    
     required_service_params = [(k, p) for (k, p) in service_params if p.opts.get("required")]
     required_method_params = [(k, p) for (k, p) in method_params if p.opts.get("required")]
-    
     body_params = ([("body", method.get("request"))] if method.get("request") else [])
     minimal_params = sorted(required_service_params + required_method_params) + body_params
     all_params = sorted(service_params + method_params + body_params) 
-        #key=lambda pair: (not (pair[1].get("required") or False), pair[0]))
     level = options.debug_request_level
-    request = get_example_request(all_params, schemas, level)
-    logger.info("Request (level={}, --debug-request-level=N to change):".format(level))
-    output(pretty_json(request))
+    request = get_example_request(minimal_params, schemas, level)
+    
+    output("Request (level={max_level}, --debug-request-level=N to change):\n{request}"
+        .format(max_level=level, request=lib.pretty_json(request)))
+
+    output("Response (level={max_level}, --debug-response-level=N to change):\n{response}"
+        .format(max_level=max_level, response=lib.pretty_json(response)))
 
 # Command: execute
 
@@ -258,6 +214,22 @@ def build_service(service_id, credentials):
     service_name, version = service_id.split(":", 1)
     return googleapiclient.discovery.build(service_name, version, http=http)
 
+def get_credentials(scopes, options):
+    if scopes and options.client_secret_file:
+        if options.credentials_file:
+            if os.path.exists(options.credentials_file):
+                credentials_path = options.credentials_file
+            else:
+                raise ShoogleException("Credentials file not found: {}".
+                    format(options.credentials_file))
+        else:
+            credentials_path = get_credentials_path(scopes, options.credentials_profile)
+        get_code = (auth.browser.get_code if options.browser_auth else auth.console.get_code)
+        client_secret = options.client_secret_file            
+        return auth.get_credentials(client_secret, credentials_path, scopes, get_code)
+    else:
+        return None
+
 def do_request(service_id, resource_name, method_name, method_options, options):
     service = get_service(service_id)
     method = get_method(service, resource_name, method_name)
@@ -268,41 +240,32 @@ def do_request(service_id, resource_name, method_name, method_options, options):
         raise ShoogleException("This method requires a media file (--media-file=PATH)")
     else:
         scopes = method.get("scopes", [])
-        if scopes and options.client_secret_file:
-            if options.credentials_file:
-                if os.path.exists(options.credentials_file):
-                    credentials_path = options.credentials_file
-                else:
-                    raise ShoogleException("Credentials file not found: {}".
-                        format(options.credentials_file))
-            else:
-                credentials_path = get_credentials_path(scopes, options.credentials_profile)
-            get_code = (auth.browser.get_code if options.browser_auth else auth.console.get_code)
-            client_secret = options.client_secret_file            
-            credentials = auth.get_credentials(client_secret, credentials_path, scopes, get_code)
-        else:
-            credentials = None
+        credentials = get_credentials(scopes, options)
         service_obj = build_service(service_id, credentials)
         resource_func = getattr(service_obj, resource_name)
         method_func = getattr(resource_func(), method_name)
         
         if options.media_file:
             media_body = apiclient.http.MediaFileUpload(options.media_file, 
-                chunksize=-1, 
-                resumable=True, 
-                mimetype="application/octet-stream"
-            )
-            logger.debug("Request: " + pretty_json(merge(method_options, 
+                chunksize=-1, resumable=True, mimetype="application/octet-stream")
+            logger.debug("Request: " + lib.pretty_json(lib.merge(method_options, 
                 {"media_body": "MediaFileUpload({})".format(options.media_file)})))
-            all_options = merge(method_options, {"media_body": media_body})
+            all_options = lib.merge(method_options, {"media_body": media_body})
             request = method_func(**all_options)
             return execute_media_request(request)
         else:
-            logger.debug("Request: " + pretty_json(method_options))
+            logger.debug("Request: " + lib.pretty_json(method_options))
             request = method_func(**method_options)
             return request.execute()
 
 # Main
+
+#class ThrowingArgumentParser(argparse.ArgumentParser):
+#    def error(self, message):
+#        raise ArgumentParserError(message)
+# or
+#
+# except SystemExit:
 
 def get_parser(description):
     parser = argparse.ArgumentParser(description=description)
@@ -351,10 +314,9 @@ def run(args):
     options = parser.parse_args(args)
 
     if options.version:
-        from shoogle import __version__
         output(__version__)
     elif options.command == "show":
-        service_id, resource_name, method_name = pad_list(options.api_path.split(".", 2), 3)
+        service_id, resource_name, method_name = lib.pad_list(options.api_path.split(".", 2), 3)
         if resource_name is None:
             show_services(service_id, options)
         elif method_name is None:
@@ -362,18 +324,26 @@ def run(args):
         else:
             show_methods(service_id, resource_name, method_name, options)
     elif options.command == "execute":
-        service_id, resource_name, method_name = pad_list(options.api_path.split(".", 2), 3)
-        method_options = load_json((sys.stdin if options.json_request == "-" 
+        service_id, resource_name, method_name = lib.pad_list(options.api_path.split(".", 2), 3)
+        method_options = lib.load_json((sys.stdin if options.json_request == "-" 
             else open(options.json_request)).read())
         response = do_request(service_id, resource_name, method_name, method_options, options)
-        output(pretty_json(response))
+        output(lib.pretty_json(response))
     else:
-        parser.print_help()
+        parser.print_help(sys.stderr)
         return 2
 
 def main(args):
+    logger = lib.get_logger("shoogle", level=logging.DEBUG, channel=sys.stderr)
     try:
         return run(args)
+    except TypeError as error:
+        frm = inspect.trace()[-1]
+        mod = inspect.getmodule(frm[0])
+        if mod.__name__ == 'googleapiclient.discovery':
+            logger.error("googleapiclient.discovery: {}".format(error))
+        else:
+            raise 
     except ShoogleException as error:
         logger.error(error)
         return 1

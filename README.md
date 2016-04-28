@@ -35,12 +35,10 @@ $ sudo python setup.py install
 
 * Exposes agnostically all the services in the API.
 * Provides infrastructure for the Oauth2 authentication (console or QT/GTK browser).
-* Shows info so you can build the JSON requests.
-* Credentials for scopes (separated by profiles) are stored for later use.
+* Shows information from the Google Discovery API to help build the JSON requests.
+* Credentials for scopes (separated by profiles).
 
-## Install
-
-## Configure the API and secret keys
+## Setup: configure the API and secret keys
 
 * You must enable the services you want to use and create the required keys or secret file in the [API Manager](https://console.developers.google.com/apis/). Each service has its own policies, check the Google documentation for more details.
 
@@ -109,7 +107,7 @@ $ shoogle execute urlshortener:v1.url.get get-longurl.json
 }
 ```
 
-* [jq](https://stedolan.github.io/jq/) is a JSON processor the comes in handy when building or parsing a JSON. This example uploads a video from a template and extracts the ID from the response:
+* [jq](https://stedolan.github.io/jq/) is a JSON processor very useful to build or parse JSON data. This example uploads a video from a JSON template and extracts the ID from the JSON response:
 
 ```shell
 $ cat upload-video.template.json
@@ -125,8 +123,8 @@ $ cat upload-video.template.json
 ```
 
 ```shell
-$ jq -n -f upload-video.template.json --arg title "My title" --arg description "Hi there!" |
-    shoogle execute -c your_client_id.json youtube:v3.videos.insert - -f video.mp4 |
+$ jq -n -f upload-video.template.json --arg title "Chess" --arg description "Norway Chess" |
+    shoogle execute -c your_client_id.json youtube:v3.videos.insert - -f chess.mp4 |
     jq -r '.id'
 wUArz2nPGqA
 ```
@@ -137,6 +135,6 @@ wUArz2nPGqA
 
 ## Feedback
 
-* Issues: Please open issues only to report bugs of the package. If you have problems regarding how to use the API itself (what authentication files to use, how to create them, how to build the parameters, quotas management, etc), use the [Google Forums](https://developers.google.com/) or [StackOverflow](http://stackoverflow.com/questions/tagged/google-api) instead.
+* Issues: Please open issues only to report bugs of the package. If you have problems regarding how to use the API itself (what authentication files to use, how to create them, how to build the parameters, quotas management, etc), use the [Google Forums](https://developers.google.com/groups/) or [StackOverflow](http://stackoverflow.com/questions/tagged/google-api) instead.
 
 * [Want to donate?](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=pyarnau%40gmail%2ecom&lc=US&item_name=youtube%2dupload&no_note=0&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest)
