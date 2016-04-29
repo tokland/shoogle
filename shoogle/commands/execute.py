@@ -1,4 +1,5 @@
 import sys
+import inspect
 
 import googleapiclient
 import httplib2
@@ -31,8 +32,16 @@ def run(options):
     service_id, resource_name, method_name = lib.pad_list(options.api_path.split(".", 2), 3)
     method_options = lib.load_json((sys.stdin if options.json_request == "-" 
         else open(options.json_request)).read())
-    response = do_request(service_id, resource_name, method_name, method_options, options)
-    lib.output(lib.pretty_json(response))
+    try:        
+      response = do_request(service_id, resource_name, method_name, method_options, options)
+      lib.output(lib.pretty_json(response))
+    except TypeError as error:
+        frm = inspect.trace()[-1]
+        mod = inspect.getmodule(frm[0])
+        if mod.__name__ == 'googleapiclient.discovery':
+            logger.error("googleapiclient.discovery: {}".format(error))
+        else:
+            raise 
 
 def execute_media_request(request):
     while 1:

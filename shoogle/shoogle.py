@@ -1,47 +1,26 @@
+"""Use the Google API from the command-line."""
 import argparse
-import collections
-import errno
-import glob
-import inspect
 import json
 import logging
-import os
-import re
-import string
 import sys
-import uuid
 
-import jsmin
-import httplib2
-import apiclient
 import oauth2client.client
 import googleapiclient.errors
 import googleapiclient.discovery
 
-from shoogle import __version__
-from . import auth
+from . import __version__
 from . import lib
 from . import common
-from . import config
 from .commands import show
 from .commands import execute
 
-
-# Main
-
-#class ThrowingArgumentParser(argparse.ArgumentParser):
-#    def error(self, message):
-#        raise ArgumentParserError(message)
-# or
-#
-# except SystemExit:
-
-default_logger = lib.get_logger("shoogle", level=logging.DEBUG, channel=sys.stderr)
+DEFAULT_LOGGER = lib.get_logger("shoogle", level=logging.ERROR, channel=sys.stderr)
 
 def get_parser(description):
+    """Return an ArgumentParser for the command-line app."""
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('-v', '--version', action="store_true", 
-        help="Show version")
+    parser.add_argument('-v', '--version', action="store_true",
+                        help="Show application version and exit")
 
     subparsers = parser.add_subparsers(help='Commands', dest="command")
     subparsers.required = False
@@ -50,30 +29,30 @@ def get_parser(description):
     return parser
 
 def run(args):
-    """Acces to Google API services."""
+    """Parse options and run shoogle commands. Return status code."""
     parser = get_parser("Command-line interface for the Google API.")
-    options = parser.parse_args(args)
+    try:
+        options = parser.parse_args(args)
+    except SystemExit:
+        return 2
 
     if options.version:
         lib.output(__version__)
+        return 0
     elif options.command == "show":
         show.run(options)
+        return 0
     elif options.command == "execute":
         execute.run(options)
+        return 0
     else:
         parser.print_help(sys.stderr)
         return 2
 
-def main(args, logger=default_logger):
+def main(args, logger=DEFAULT_LOGGER):
+    """Run shoogle with command-line arguments and return status code."""
     try:
         return run(args)
-    except TypeError as error:
-        frm = inspect.trace()[-1]
-        mod = inspect.getmodule(frm[0])
-        if mod.__name__ == 'googleapiclient.discovery':
-            logger.error("googleapiclient.discovery: {}".format(error))
-        else:
-            raise 
     except common.ShoogleException as error:
         logger.error(error)
         return 1
