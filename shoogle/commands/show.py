@@ -3,23 +3,20 @@ import re
 
 from .. import lib
 from .. import common
-from .. import config
-
-logger = config.logger
-output = lib.output
+from ..config import logger
 
 def add_parser(subparsers, name):
     parser = subparsers.add_parser(name)
-
-    parser.add_argument('--debug-request-level', type=int, default=1, 
+    parser.add_argument('--debug-request-level', type=int, default=1,
         help='Levels to show of the example request body')
-    parser.add_argument('--debug-response-level', type=int, default=0, 
+    parser.add_argument('--debug-response-level', type=int, default=0,
         help='Levels to show of the response schema on debug messages')
     parser.add_argument('api_path', metavar="API_PATH", nargs='?', default="",
         help="SERVICE:VERSION.RESOURCE.METHOD")
 
 def run(options):
-    service_id, resource_name, method_name = lib.pad_list(options.api_path.split(".", 2), 3)
+    parts = options.api_path.split(".", 2)
+    service_id, resource_name, method_name = lib.pad_list(parts, 3)
     if resource_name is None:
         show_services(service_id, options)
     elif method_name is None:
@@ -38,7 +35,7 @@ def show_services(search_service_id, options):
     else:    
         for service_id, item in sorted(filtered_services):
             if re.search(search_service_id, service_id):
-                output("{id} - {title}".format(id=service_id, title=item["title"]))
+                lib.output("{id} - {title}".format(id=service_id, title=item["title"]))
 
 def show_resources(service_id, search_resource_name, options):
     resources = common.get_service(service_id)["resources"]
@@ -54,7 +51,7 @@ def show_resources(service_id, search_resource_name, options):
         show_methods(service_id, search_resource_name, "", options)
     else:    
         for resource_name, resource in sorted(filtered_resources):
-            output("{service}.{name}".format(
+            lib.output("{service}.{name}".format(
                 service=service_id, 
                 name=resource_name,
             ))
@@ -80,7 +77,7 @@ def show_methods(service_id, resource_name, search_method_name, options):
         show_method(service, methods[search_method_name], options)
     else:    
         for method_name, method in sorted(filtered_methods):
-            output("{service}.{resource}.{name} - {description}".format(
+            lib.output("{service}.{resource}.{name} - {description}".format(
                 service=service_id, 
                 resource=resource_name, 
                 name=method_name,
@@ -112,12 +109,8 @@ def get_example_request(params, schemas, max_level):
 
 def show_method(service, method, options):
     schemas = service["schemas"]
-
     max_level = options.debug_response_level
     response = common.replace_schemas(schemas, method.get("response", {}), max_level=max_level)
-        
-    output("{id}: {description}".format(id=method["id"], description=method["description"]))
-
     build_param = collections.namedtuple("Param", ["opts"])
     service_params = [(k, build_param(v)) for (k, v) in service.get("parameters", {}).items()]
     method_params = [(k, build_param(v)) for (k, v) in method.get("parameters", {}).items()]
@@ -128,10 +121,9 @@ def show_method(service, method, options):
     all_params = sorted(service_params + method_params + body_params) 
     level = options.debug_request_level
     request = get_example_request(minimal_params, schemas, level)
-    
-    output("Request (level={max_level}, --debug-request-level=N to change):\n{request}"
+
+    lib.output("{id}: {description}".format(id=method["id"], description=method["description"]))    
+    lib.output("Request (level={max_level}, --debug-request-level=N to change):\n{request}"
         .format(max_level=level, request=lib.pretty_json(request)))
-
-    output("Response (level={max_level}, --debug-response-level=N to change):\n{response}"
+    lib.output("Response (level={max_level}, --debug-response-level=N to change):\n{response}"
         .format(max_level=max_level, response=lib.pretty_json(response)))
-

@@ -1,6 +1,6 @@
 # Shoogle
 
-Use the Google API from the shell.
+Use the Google API from the shell. An example, get the long URL using the *urlshortener* service:
 
 ```shell
 $ echo '{"shortUrl": "http://goo.gl/Du5PSN"}' | shoogle execute urlshortener:v1.url.get -
@@ -14,7 +14,9 @@ $ echo '{"shortUrl": "http://goo.gl/Du5PSN"}' | shoogle execute urlshortener:v1.
 
 ## Install
 
-You need Python >= 3.0. 
+### Dependencies
+
+* Python >= 3.0 
 
 ### From PyPi
 
@@ -36,7 +38,7 @@ $ sudo python setup.py install
 * Exposes agnostically all the services in the API.
 * Provides infrastructure for the Oauth2 authentication (console or QT/GTK browser).
 * Shows information from the Google Discovery API to help build the JSON requests.
-* Credentials for scopes (separated by profiles).
+* Save credentials for each set of scopes.
 
 ## Setup: configure the API and secret keys
 
@@ -55,7 +57,6 @@ adexchangebuyer:v1.2 - Ad Exchange Buyer API
 ...
 youtubeAnalytics:v1beta1 - YouTube Analytics API
 youtubereporting:v1 - YouTube Reporting API
-
 ```
 
 ```shell
@@ -107,7 +108,7 @@ $ shoogle execute urlshortener:v1.url.get get-longurl.json
 }
 ```
 
-* [jq](https://stedolan.github.io/jq/) is a JSON processor very useful to build or parse JSON data. This example uploads a video from a JSON template and extracts the ID from the JSON response:
+* [jq](https://stedolan.github.io/jq/) is a command-line JSON builder/parser. This example shows how to upload a video from a JSON template and extract the ID from the response:
 
 ```shell
 $ cat upload-video.template.json
@@ -135,6 +136,6 @@ wUArz2nPGqA
 
 ## Feedback
 
-* Issues: Please open issues only to report bugs of the package. If you have problems regarding how to use the API itself (what authentication files to use, how to create them, how to build the parameters, quotas management, etc), use the [Google Forums](https://developers.google.com/groups/) or [StackOverflow](http://stackoverflow.com/questions/tagged/google-api) instead.
+* Issues: Please open issues only to report bugs of the package. If you have problems regarding how to use the API itself (what auth is required, how to create those auth files, how to build the request parameters, quotas management, etc), use the [Google Forums](https://developers.google.com/groups/) or [StackOverflow](http://stackoverflow.com/questions/tagged/google-api).
 
 * [Want to donate?](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=pyarnau%40gmail%2ecom&lc=US&item_name=youtube%2dupload&no_note=0&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest)

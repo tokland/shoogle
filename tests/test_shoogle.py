@@ -18,6 +18,7 @@ import tempfile
 
 from shoogle import shoogle
 from shoogle import lib
+from shoogle import config
 
 import jsmin
 
@@ -36,10 +37,9 @@ def main(*args, **kwargs):
     old_stdout, old_stderr = sys.stdout, sys.stderr
     new_stdout, new_stderr = StringIO(), StringIO()
     sys.stdout, sys.stderr = new_stdout, new_stderr
-    debug_logger = lib.get_logger("shoogle", level=logging.ERROR, channel=new_stderr)
-    kwargs_with_logger = lib.merge(kwargs, dict(logger=debug_logger))
+    config.logger = lib.get_logger("shoogle-test", level=logging.ERROR, channel=new_stderr)
     try:
-        status = shoogle.main(*args, **kwargs_with_logger)
+        status = shoogle.main(*args, **kwargs)
     finally:
         sys.stdout, sys.stderr  = old_stdout, old_stderr
     yield (new_stdout.getvalue(), new_stderr.getvalue(), status)

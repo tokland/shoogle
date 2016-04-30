@@ -11,21 +11,17 @@ import googleapiclient.discovery
 from . import __version__
 from . import lib
 from . import common
-from .commands import show
-from .commands import execute
-
-DEFAULT_LOGGER = lib.get_logger("shoogle", level=logging.ERROR, channel=sys.stderr)
+from . import commands
+from . import config
 
 def get_parser(description):
     """Return an ArgumentParser for the command-line app."""
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('-v', '--version', action="store_true",
-                        help="Show application version and exit")
-
+    parser.add_argument('-v', '--version', action="store_true", help="Show version and exit")
     subparsers = parser.add_subparsers(help='Commands', dest="command")
     subparsers.required = False
-    show.add_parser(subparsers, "show")
-    execute.add_parser(subparsers, "execute")
+    commands.show.add_parser(subparsers, "show")
+    commands.execute.add_parser(subparsers, "execute")
     return parser
 
 def run(args):
@@ -40,17 +36,18 @@ def run(args):
         lib.output(__version__)
         return 0
     elif options.command == "show":
-        show.run(options)
+        commands.show.run(options)
         return 0
     elif options.command == "execute":
-        execute.run(options)
+        commands.execute.run(options)
         return 0
     else:
         parser.print_help(sys.stderr)
         return 2
 
-def main(args, logger=DEFAULT_LOGGER):
+def main(args):
     """Run shoogle with command-line arguments and return status code."""
+    logger = config.logger
     try:
         return run(args)
     except common.ShoogleException as error:
@@ -60,13 +57,12 @@ def main(args, logger=DEFAULT_LOGGER):
         status = error.resp["status"]
         data = bytes.decode(error.content).strip()
         logger.error("Server error response ({0}): {1}".format(status, data))
-        return 1
+        return 3
     except oauth2client.client.FlowExchangeError as error:
         logger.error("OAuth 2 error: {}".format(error))
     except json.decoder.JSONDecodeError as error:
-        logger.error("JSONDecodeError: " + str(error))
-        logger.error("JSON was: " + error.doc)
-        return 1
+        logger.error("JSONDecodeError({}): {}".format(str(error), error.doc))
+        return 4
 
 if __name__ == '__main__':
     sys.exit(run(sys.argv[:1]))
