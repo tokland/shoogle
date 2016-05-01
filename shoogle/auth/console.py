@@ -1,8 +1,10 @@
+"""Auth module that uses the console to prompt the user."""
 import sys
 import contextlib
 
 @contextlib.contextmanager
 def stdin_replaced_by(new_stdin):
+    """Context manager that changes temporally sys.stdin."""
     old_stdin = sys.stdin
     try:
         sys.stdin = new_stdin

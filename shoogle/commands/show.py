@@ -7,6 +7,7 @@ from ..config import logger
 
 def add_parser(subparsers, name):
     parser = subparsers.add_parser(name)
+
     parser.add_argument('--debug-request-level', type=int, default=1,
         help='Levels to show of the example request body')
     parser.add_argument('--debug-response-level', type=int, default=0,
@@ -28,6 +29,7 @@ def show_services(search_service_id, options):
     services = common.get_services()
     filtered_services = [(service_id, item) for (service_id, item) in services.items() 
         if re.search(search_service_id, service_id)]
+
     if len(filtered_services) == 0:
         logger.info("API service not found: {}".format(search_service_id))
     elif len(filtered_services) == 1 and search_service_id in services:

@@ -74,7 +74,11 @@ def get_credentials(scopes, options):
                 raise common.ShoogleException(msg)
         else:
             credentials_path = common.get_credentials_path(scopes, options.credentials_profile)
-        get_code = (auth.browser.get_code if options.browser_auth else auth.console.get_code)
+        if options.browser_auth:
+            from shoogle.auth import browser
+            get_code = auth.browser.get_code
+        else:
+            get_code = auth.console.get_code
         client_secret = options.client_secret_file
         return auth.get_credentials(client_secret, credentials_path, scopes, get_code)
     else:
