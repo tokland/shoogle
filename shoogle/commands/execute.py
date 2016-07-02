@@ -78,6 +78,7 @@ def get_credentials(scopes, options):
             from shoogle.auth import browser
             get_code = auth.browser.get_code
         else:
+            from shoogle.auth import console
             get_code = auth.console.get_code
         client_secret = options.client_secret_file
         return auth.get_credentials(client_secret, credentials_path, scopes, get_code)
