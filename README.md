@@ -30,6 +30,7 @@ $ sudo pip install shoogle
 $ wget https://github.com/tokland/shoogle/archive/master.zip
 $ unzip master.zip
 $ cd shoogle-master
+$ sudo pip install pypandoc
 $ sudo python setup.py install
 ```
 
