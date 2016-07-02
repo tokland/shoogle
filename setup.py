@@ -34,7 +34,8 @@ setup(
     url='https://github.com/tokland/shoogle',
     packages=[
         'shoogle',
-        "shoogle/auth"
+        "shoogle/auth",
+        "shoogle/commands",
     ],
     package_dir={'shoogle': 'shoogle'},
     scripts=["bin/shoogle"],
