@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 
-import pypandoc
+try:
+    import pypandoc
+except ImportError:
+    print("Install pypandoc to generate long_description")
+    pypandoc = None
+  
 from setuptools import setup
 
 requirements = [
@@ -11,8 +16,13 @@ requirements = [
 
 test_requirements = []
 
-long_description = pypandoc.convert('README.md', 'rst') + '\n\n' + \
-    pypandoc.convert('CHANGELOG.md', 'rst') 
+if pypandoc:
+    long_description = "\n\n".join([
+        pypandoc.convert('README.md', 'rst'),
+        pypandoc.convert('CHANGELOG.md', 'rst'),
+    ])
+else:
+    long_description = "[pypandoc missing]"
  
 setup(
     name='shoogle',
