@@ -3,18 +3,10 @@
 try:
     import pypandoc
 except ImportError:
-    print("Install pypandoc to generate long_description")
+    print("Install pypandoc to generate the field long_description")
     pypandoc = None
   
 from setuptools import setup
-
-requirements = [
-    "google-api-python-client",
-    "jsmin",
-    "httplib2",
-]
-
-test_requirements = []
 
 if pypandoc:
     long_description = "\n\n".join([
@@ -40,7 +32,11 @@ setup(
     package_dir={'shoogle': 'shoogle'},
     scripts=["bin/shoogle"],
     include_package_data=True,
-    install_requires=requirements,
+    install_requires=[
+        "google-api-python-client",
+        "jsmin",
+        "httplib2",
+    ],
     license="ISCL",
     zip_safe=False,
     keywords='shoogle',
@@ -58,5 +54,5 @@ setup(
         'Programming Language :: Python :: 3.5',
     ],
     test_suite='tests',
-    tests_require=test_requirements,
+    tests_require=[],
 )
