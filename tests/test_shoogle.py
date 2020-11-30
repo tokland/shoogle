@@ -20,7 +20,6 @@ import unittest
 import shoogle
 from shoogle import lib
 from shoogle import config
-from . import secrets
 
 import jsmin
 
@@ -151,19 +150,6 @@ class TestShoogle(unittest.TestCase):
         response_json = load_json(jsons[1])
         self.assertEqual(["shortUrl"], list(request_json.keys()))
         self.assertEqual({"$ref": 'Url'}, response_json)
-
-    def test_main_execute(self):
-        request = """{
-            "key": "%s",
-            "shortUrl": "http://goo.gl/Du5PSN"
-        }""" % secrets.server_key
-
-        with temporal_file(request) as request_file:
-            e = main(["execute", "urlshortener:v1.url.get", request_file])
-            self.assertEqual(0, e.status)
-            response = load_json(e.out)
-            self.assertEqual(set(["id", "kind", "longUrl", "status"]), set(response.keys()))
-            self.assertEqual(response["status"], "OK")
 
     def test_main_execute_with_missing_parameter(self):
         with temporal_file("{}") as request_file:
