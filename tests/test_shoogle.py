@@ -116,7 +116,7 @@ class TestShoogle(unittest.TestCase):
     def test_main_with_exact_resource_string_shows_all_methods_sorted(self):
         e = main(["show", "youtube:v3.videos"])
         lines = e.out.splitlines()
-        methods = [line.split()[0] for line in lines]
+        methods = [line.split()[0] for line in lines if " - " in line]
 
         self.assertEqual(0, e.status)
         self.assertIn("youtube:v3.videos.list", methods)
