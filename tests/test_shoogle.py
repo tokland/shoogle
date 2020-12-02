@@ -20,7 +20,6 @@ import unittest
 import shoogle
 from shoogle import lib
 from shoogle import config
-from . import secrets
 
 import jsmin
 
@@ -116,7 +115,7 @@ class TestShoogle(unittest.TestCase):
     def test_main_with_exact_resource_string_shows_all_methods_sorted(self):
         e = main(["show", "youtube:v3.videos"])
         lines = e.out.splitlines()
-        methods = [line.split()[0] for line in lines]
+        methods = [line.split()[0] for line in lines if " - " in line]
 
         self.assertEqual(0, e.status)
         self.assertIn("youtube:v3.videos.list", methods)
@@ -142,34 +141,21 @@ class TestShoogle(unittest.TestCase):
         self.assertTrue("Response" in line for line in lines)
 
     def test_main_with_exact_method_shows_request_with_minimal_params(self):
-        e = main(["show", "urlshortener:v1.url.get"])
+        e = main(["show", "tasks:v1.tasks.get"])
         jsons = re.findall(r"^\{$.*?^\}$", e.out, re.MULTILINE | re.DOTALL)
 
         self.assertEqual(0, e.status)
         self.assertEqual(2, len(jsons))
         request_json = load_json(jsons[0])
         response_json = load_json(jsons[1])
-        self.assertEqual(["shortUrl"], list(request_json.keys()))
-        self.assertEqual({"$ref": 'Url'}, response_json)
-
-    def test_main_execute(self):
-        request = """{
-            "key": "%s",
-            "shortUrl": "http://goo.gl/Du5PSN"
-        }""" % secrets.server_key
-
-        with temporal_file(request) as request_file:
-            e = main(["execute", "urlshortener:v1.url.get", request_file])
-            self.assertEqual(0, e.status)
-            response = load_json(e.out)
-            self.assertEqual(set(["id", "kind", "longUrl", "status"]), set(response.keys()))
-            self.assertEqual(response["status"], "OK")
+        self.assertEqual(["task", "tasklist"], list(request_json.keys()))
+        self.assertEqual({"$ref": 'Task'}, response_json)
 
     def test_main_execute_with_missing_parameter(self):
         with temporal_file("{}") as request_file:
-            e = main(["execute", "urlshortener:v1.url.get", request_file])
+            e = main(["execute", "tasks:v1.tasks.get", request_file])
             self.assertEqual(0, e.status)
-            self.assertIn('Missing required parameter "shortUrl"', e.err)
+            self.assertIn('Missing required parameter', e.err)
         
 if __name__ == '__main__':
     sys.exit(unittest.main())
