@@ -156,6 +156,11 @@ class TestShoogle(unittest.TestCase):
             e = main(["execute", "tasks:v1.tasks.get", request_file])
             self.assertEqual(0, e.status)
             self.assertIn('Missing required parameter', e.err)
+
+    def test_main_show_with_fractional_version(self):
+        e = main(["show", "content:v2.1"])
+
+        self.assertTrue("content:v2.1" in e.out)
         
 if __name__ == '__main__':
     sys.exit(unittest.main())
