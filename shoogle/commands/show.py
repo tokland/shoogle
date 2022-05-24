@@ -16,8 +16,11 @@ def add_parser(subparsers, name):
         help="SERVICE:VERSION.RESOURCE.METHOD")
 
 def run(options):
-    parts = options.api_path.split(".", 2)
+    parts = options.api_path.split(".")
+    if len(parts) >= 2 and parts[1].isdigit():
+        parts = [f"{parts[0]}.{parts[1]}"] + parts[2:]
     service_id, resource_name, method_name = lib.pad_list(parts, 3)
+
     if resource_name is None:
         show_services(service_id, options)
     elif method_name is None:

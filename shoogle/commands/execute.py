@@ -33,7 +33,11 @@ def add_parser(main_parser, name):
 
 def run(options):
     """Run command execute."""
-    service_id, resource_name, method_name = lib.pad_list(options.api_path.split(".", 2), 3)
+    components = options.api_path.split(".")
+    if len(components) > 1 and components[1].isdigit():
+        components = [f"{components[0]}.{components[1]}"] + components[2:]
+    service_id, resource_name, method_name = lib.pad_list(components, 3)
+
     request_fd = (sys.stdin if options.json_request == "-" else open(options.json_request))
     method_options = lib.load_json(request_fd.read())
     try:
