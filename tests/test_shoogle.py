@@ -54,7 +54,7 @@ class TestShoogle(unittest.TestCase):
         self.assertIn("usage: ", e.err)
         self.assertIn("positional arguments:", e.err)
         self.assertIn("{show,execute}", e.err)
-        self.assertIn("optional arguments:", e.err)
+        self.assertIn("options:", e.err)
 
     def test_main_with_option_shows_usage_and_help_messages(self):
         e = main(["-h"])
@@ -63,7 +63,7 @@ class TestShoogle(unittest.TestCase):
         self.assertIn("usage: ", e.out)
         self.assertIn("positional arguments:", e.out)
         self.assertIn("{show,execute}", e.out)
-        self.assertIn("optional arguments:", e.out)
+        self.assertIn("options:", e.out)
 
     def test_main_with_option_shows_version(self):
         e = main(["-v"])
@@ -77,7 +77,6 @@ class TestShoogle(unittest.TestCase):
         self.assertEqual(0, e.status)
         lines = e.out.splitlines()
         services = [line.split()[0] for line in lines]
-        self.assertIn("webmasters:v3", services)
         self.assertIn("youtube:v3", services)
         self.assertEqual(list(sorted(services)), services)
 
